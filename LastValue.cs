@@ -48,7 +48,46 @@ namespace bmsPiFunction
                 {
                     return new HttpResponseMessage(HttpStatusCode.BadRequest)
                     {
-                        Content = new StringContent(JsonConvert.SerializeObject("Could not find any readings"), Encoding.UTF8, "application/json")
+                        Content = new StringContent(JsonConvert.SerializeObject("Could not find any readings for this sensor"), Encoding.UTF8, "application/json")
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                return new HttpResponseMessage(HttpStatusCode.InternalServerError) { Content = new StringContent(ex.Message, Encoding.UTF8, "application/json") };
+            }
+        }
+
+        [FunctionName("PastValues")]
+        public static HttpResponseMessage Run2(
+    [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "reccords/{sensorId}/pastvalues")] HttpRequestMessage req,
+    [CosmosDB(
+                databaseName: "bim42db",
+                collectionName: "bmsPiCollection",
+                ConnectionStringSetting = "myDBConnectionString",
+                SqlQuery = "SELECT top 2880 * FROM c where c.sensorId = {sensorId} order by c._ts desc")]IEnumerable<Reading> readings,
+    ILogger log)
+        {
+            try
+            {
+                log.LogInformation("Getting the last sensor values");
+
+                if (readings.Count() != 0)
+                {
+                    return new HttpResponseMessage(HttpStatusCode.OK)
+                    {
+                        Content = new StringContent(
+                                JsonConvert.SerializeObject(readings),
+                                Encoding.UTF8,
+                                "application/json"
+                                )
+                    };
+                }
+                else
+                {
+                    return new HttpResponseMessage(HttpStatusCode.BadRequest)
+                    {
+                        Content = new StringContent(JsonConvert.SerializeObject("Could not find any readings for this sensor"), Encoding.UTF8, "application/json")
                     };
                 }
             }
