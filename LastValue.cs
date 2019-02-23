@@ -142,7 +142,7 @@ namespace bmsPiFunction
             contentValues.Add(new KeyValuePair<string, string>("client_id", client_id));
             contentValues.Add(new KeyValuePair<string, string>("client_secret", client_secret));
             contentValues.Add(new KeyValuePair<string, string>("grant_type", "client_credentials"));
-            contentValues.Add(new KeyValuePair<string, string>("scope", "data:write viewables:read data:read bucket:read"));
+            contentValues.Add(new KeyValuePair<string, string>("scope", "viewables:read"));
 
             FormUrlEncodedContent formContent = new FormUrlEncodedContent(contentValues);
 
